@@ -2,6 +2,9 @@ from abc import ABC, abstractmethod
 from types import TracebackType
 from typing import Self
 
+import yaml
+
+from pygate.config import PygateConfig, build_config_store
 from pygate.settings import Settings
 
 
@@ -30,9 +33,14 @@ class DIContainer(ABC):
 class ServiceContainer(DIContainer):
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
+        self.config_store = build_config_store(
+            settings=self.settings.config,
+            model_cls=PygateConfig,
+            parse_fn=yaml.safe_load,
+        )
 
     async def startup(self) -> None:
-        pass
+        await self.config_store.start()
 
     async def shutdown(self) -> None:
         pass
