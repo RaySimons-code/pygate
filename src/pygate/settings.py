@@ -5,6 +5,7 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, CliSettingsSource, SettingsConfigDict
 
 from pygate.argparser import create_root_parser, parse_env_file_path
+from pygate.config import ConfigSettings
 
 ENV_FILE_OVERRIDE_VAR = "PYGATE_ENV_FILE"
 
@@ -16,10 +17,14 @@ class Settings(BaseSettings):
         env_file_encoding="UTF-8",
         cli_parse_args=True,
         cli_kebab_case=True,
+        cli_avoid_json=True,
+        env_nested_delimiter="__",
     )
 
     host: str = "0.0.0.0"
     port: Annotated[int, Field(ge=1, le=65535)] = 8080
+
+    config: Annotated[ConfigSettings, Field(default_factory=ConfigSettings)]
 
 
 def get_settings(env_file: str | None = None) -> Settings:
